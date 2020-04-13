@@ -11,6 +11,7 @@ from . import models
 # flask-style route decorators
 url, urlpatterns = routing()
 
+predictor = models.Predictor()
 
 @url(r'^health_check/ping$')
 def king(request):
@@ -20,3 +21,15 @@ def king(request):
         return JsonResponse({
             'message': 'pong',
         }, status=200)
+
+
+@url(r'^predict$')
+def predict(request):
+    if request.method.upper() != 'POST':
+        return HttpResponseNotAllowed(['POST'])  # List of allowed ones
+    else:
+        json_data = request.POST.dict() or json.loads(request.body.decode('utf-8'))
+
+        answer = predictor.predict(json_data)
+
+        return JsonResponse(answer, safe=False, status=200)
