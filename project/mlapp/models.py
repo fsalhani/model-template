@@ -2,8 +2,6 @@
 import logging
 
 from sklearn.externals import joblib
-from django.core.files.storage import default_storage
-
 from mlapp.core.mlmodel import MLModel
 
 logger = logging.getLogger(__name__)
@@ -16,16 +14,15 @@ class Trainer:
     def prepare(self):
         pass
 
-    def train(self, update_multipliers):
+    def train(self):
         logger.info('Starting training routine')
         self._model.fit()
         logger.info('Completed training routine')
 
     def save_model(self):
         logger.info('Saving the model')
-        model_file = default_storage.open('mlapp/model/model.pkl', 'wb')
-        model_file.write(open(joblib.dump(self._model, '/tmp/model.pkl', compress=5)[0], 'rb').read())
-        model_file.close()
+        with open('mlapp/model/model.pkl', 'wb') as model_file:
+            joblib.dump(self._model, model_file)
         logger.info('Model saved')
 
 
@@ -36,9 +33,8 @@ class Predictor:
     def load_model(self):
         try:
             logger.info('Loading model')
-            model_file = default_storage.open(settings.MODEL_PATH, 'rb')
-            self._model = joblib.load(model_file)
-            model_file.close()
+            with open('mlapp/model/model.pkl', 'rb') as model_file:
+                self._model = joblib.load(model_file)
             logger.info('Model loaded')
             return True
         except (ValueError, IOError) as e:
