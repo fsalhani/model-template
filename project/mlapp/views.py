@@ -28,8 +28,10 @@ def predict(request):
     if request.method.upper() != 'POST':
         return HttpResponseNotAllowed(['POST'])  # List of allowed ones
     else:
-        json_data = request.POST.dict() or json.loads(request.body.decode('utf-8'))
-
+        try:
+            json_data = json.loads(request.body.decode('utf-8'))
+        except:
+            json_data = {}
         answer = predictor.predict(json_data)
 
         return JsonResponse(answer, safe=False, status=200)
