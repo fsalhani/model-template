@@ -1,7 +1,7 @@
 # coding: utf-8
 import logging
 
-from sklearn.externals import joblib
+import joblib
 from mlapp.core.mlmodel import MLModel
 
 logger = logging.getLogger(__name__)
